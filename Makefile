@@ -203,16 +203,6 @@ grade:
 	  (echo "'make clean' failed.  HINT: Do you have another running instance of xv6?" && exit 1)
 	./grade-lab-$(LAB) $(GRADEFLAGS)
 
-WEBSUB := https://6828.scripts.mit.edu/2019/handin.py
-
-handin: tarball-pref myapi.key
-	@SUF=$(LAB); \
-	curl -f -F file=@lab-$$SUF-handin.tar.gz -F key=\<myapi.key $(WEBSUB)/upload \
-	    > /dev/null || { \
-		echo ; \
-		echo Submit seems to have failed.; \
-		echo Please go to $(WEBSUB)/ and upload the tarball manually.; }
-
 handin-check:
 	@if ! test -d .git; then \
 		echo No .git directory, is this a git repository?; \
@@ -235,7 +225,7 @@ handin-check:
 		test "$$r" = y; \
 	fi
 
-UPSTREAM := $(shell git remote -v | grep -m 1 "mit-pdos/xv6-riscv-fall19" | awk '{split($$0,a," "); print a[1]}')
+UPSTREAM := $(shell git remote -v | grep -m 1 "csep551/xv6-au19" | awk '{split($$0,a," "); print a[1]}')
 
 tarball: handin-check
 	git archive --format=tar HEAD | gzip > lab-$(LAB)-handin.tar.gz
@@ -249,23 +239,4 @@ tarball-pref: handin-check
 	rm lab-$$SUF-handin.tar; \
 	rm /tmp/lab-$$SUF-diff.patch; \
 
-myapi.key:
-	@echo Get an API key for yourself by visiting $(WEBSUB)/
-	@read -p "Please enter your API key: " k; \
-	if test `echo "$$k" |tr -d '\n' |wc -c` = 32 ; then \
-		TF=`mktemp -t tmp.XXXXXX`; \
-		if test "x$$TF" != "x" ; then \
-			echo "$$k" |tr -d '\n' > $$TF; \
-			mv -f $$TF $@; \
-		else \
-			echo mktemp failed; \
-			false; \
-		fi; \
-	else \
-		echo Bad API key: $$k; \
-		echo An API key should be 32 characters long.; \
-		false; \
-	fi;
-
-
-.PHONY: handin tarball tarball-pref clean grade handin-check
+.PHONY: tarball tarball-pref clean grade handin-check
