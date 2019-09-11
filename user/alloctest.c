@@ -6,14 +6,15 @@
 #include "kernel/memlayout.h"
 #include "user/user.h"
 
+enum { NCHILD = 50, NFD = 10};
+
 void
 test0() {
-  enum { NCHILD = 50, NFD = 10};
   int i, j;
   int fd;
 
   printf("filetest: start\n");
-  
+
   if(NCHILD*NFD < NFILE) {
     printf("test setup is wrong\n");
     exit(1);
@@ -22,14 +23,15 @@ test0() {
   for (i = 0; i < NCHILD; i++) {
     int pid = fork();
     if(pid < 0){
-      printf("fork failed");
-      exit(1);
+      printf("fork failed\n");
+      exit(-1);
     }
     if(pid == 0){
       for(j = 0; j < NFD; j++) {
         if ((fd = open("README", O_RDONLY)) < 0) {
           // the open() failed; exit with -1
-          exit(1);
+          printf("open failed\n");
+          exit(-1);
         }
       }
       sleep(10);
@@ -37,69 +39,66 @@ test0() {
     }
   }
 
-  int all_ok = 1;
   for(int i = 0; i < NCHILD; i++){
     int xstatus;
     wait(&xstatus);
-    if(xstatus != 0) {
-      if(all_ok == 1)
-        printf("filetest: FAILED\n");
-      all_ok = 0;
+    if(xstatus == -1) {
+       printf("filetest: FAILED\n");
+       exit(-1);
     }
   }
 
-  if(all_ok)
-    printf("filetest: OK\n");
+  printf("filetest: OK\n");
 }
 
-// Allocate all free memory and count how it is
 void test1()
 {
-  void *a;
-  int tot = 0;
-  char buf[1];
-  int fds[2];
-  
-  printf("memtest: start\n");  
-  if(pipe(fds) != 0){
-    printf("pipe() failed\n");
-    exit(1);
-  }
-  int pid = fork();
+  int pid, xstatus, n0, n;
+
+  printf("memtest: start\n");
+
+  n0 = nfree();
+
+  pid = fork();
   if(pid < 0){
     printf("fork failed");
     exit(1);
   }
+
   if(pid == 0){
-      close(fds[0]);
-      while(1) {
-        a = sbrk(PGSIZE);
-        if (a == (char*)0xffffffffffffffffL)
-          exit(0);
-        *(int *)(a+4) = 1;
-        if (write(fds[1], "x", 1) != 1) {
-          printf("write failed");
-          exit(1);
-        }
+    int i, fd;
+
+    n0 = nfree();
+    for(i = 0; i < NFD; i++) {
+      if ((fd = open("README", O_RDONLY)) < 0) {
+        // the open() failed; exit with -1
+        printf("open failed\n");
+        exit(-1);
       }
-      exit(0);
+    }
+    n = n0 - nfree();
+    // n should be 0 but we're okay with 1
+    if(n != 0 && n != 1){
+      printf("expected to allocate at most one page, got %d\n", n);
+      exit(-1);
+    }
+    exit(0);
   }
-  close(fds[1]);
-  while(1) {
-      if (read(fds[0], buf, 1) != 1) {
-        break;
-      } else {
-        tot += 1;
-      }
+
+  wait(&xstatus);
+  if(xstatus == -1)
+    goto failed;
+
+  n = n0 - nfree();
+  if(n){
+    printf("expected to free all the pages, got %d\n", n);
+    goto failed;
   }
-  //int n = (PHYSTOP-KERNBASE)/PGSIZE;
-  //printf("allocated %d out of %d pages\n", tot, n);
-  if(tot < 31950) {
-    printf("expected to allocate at least 31950, only got %d\n", tot);
-    printf("memtest: FAILED\n");  
-  } else {
-    printf("memtest: OK\n");  
-  }
+  printf("memtest: OK\n");
+  return;
+
+failed:
+  printf("memtest: FAILED\n");
 }
 
 int
