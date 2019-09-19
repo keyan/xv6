@@ -1,0 +1,43 @@
+#!/usr/bin/env python
+
+import re
+from gradelib import *
+
+r = Runner(save("xv6.out"))
+
+@test(5, "test /dev/null")
+def test_devnull():
+    r.run_qemu(shell_script([
+        'specialtest'
+    ]))
+    r.match('^SUCCESS: test /dev/null$', no=["exec .* failed"])
+
+@test(5, "test /dev/zero")
+def test_devnull():
+    r.run_qemu(shell_script([
+        'specialtest'
+    ]))
+    r.match('^SUCCESS: test /dev/zero$', no=["exec .* failed"])
+
+@test(5, "test /dev/uptime")
+def test_devnull():
+    r.run_qemu(shell_script([
+        'specialtest'
+    ]))
+    r.match('^SUCCESS: test /dev/uptime$', no=["exec .* failed"])
+
+@test(5, "test /dev/random")
+def test_devnull():
+    r.run_qemu(shell_script([
+        'specialtest'
+    ]))
+    r.match('^SUCCESS: test /dev/random$', no=["exec .* failed"])
+
+@test(20, "test symlinks")
+def test_devnull():
+    r.run_qemu(shell_script([
+        'symlinktest'
+    ]))
+    r.match('^SUCCESS: test symlinks$', no=["exec .* failed"])
+
+run_tests()
