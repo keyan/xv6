@@ -84,8 +84,14 @@ printf(char *fmt, ...)
     if(c == 0)
       break;
     switch(c){
+    case 'c':
+      consputc(va_arg(ap, int));
+      break;
     case 'd':
       printint(va_arg(ap, int), 10, 1);
+      break;
+    case 'u':
+      printint(va_arg(ap, int), 10, 0);
       break;
     case 'x':
       printint(va_arg(ap, int), 16, 1);
