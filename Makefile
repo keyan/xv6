@@ -188,7 +188,7 @@ qemu-gdb: $K/kernel .gdbinit fs.img
 ##  FOR submitting lab solutions
 ##
 
--include conf/lab.mk
+LAB := $(shell git symbolic-ref --short HEAD)
 
 ifneq ($(V),@)
 GRADEFLAGS += -v
@@ -225,18 +225,7 @@ handin-check:
 		test "$$r" = y; \
 	fi
 
-UPSTREAM := $(shell git remote -v | grep -m 1 "csep551/xv6-au19" | awk '{split($$0,a," "); print a[1]}')
-
 tarball: handin-check
 	git archive --format=tar HEAD | gzip > lab-$(LAB)-handin.tar.gz
-
-tarball-pref: handin-check
-	@SUF=$(LAB); \
-	git archive --format=tar HEAD > lab-$$SUF-handin.tar; \
-	git diff $(UPSTREAM)/$(LAB) > /tmp/lab-$$SUF-diff.patch; \
-	tar -rf lab-$$SUF-handin.tar /tmp/lab-$$SUF-diff.patch; \
-	gzip -c lab-$$SUF-handin.tar > lab-$$SUF-handin.tar.gz; \
-	rm lab-$$SUF-handin.tar; \
-	rm /tmp/lab-$$SUF-diff.patch; \
 
 .PHONY: tarball tarball-pref clean grade handin-check
