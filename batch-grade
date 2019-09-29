@@ -32,7 +32,7 @@ def grade(config, repo, path, single, output):
     if single:
         submissions = [path]
     else:
-        submissions = [os.path.join(path, f) for f in os.listdir(path) if not f.startswith('.')]
+        submissions = [os.path.join(path, f) for f in os.listdir(path) if not f.startswith('.') and f.endswith('.tar.gz')]
     results = []
     start = time.time()
     for i, sub in enumerate(submissions):
@@ -43,12 +43,12 @@ def grade(config, repo, path, single, output):
             '?' if i == 0 else hms((time.time() - start)*(len(submissions)-i)/i)
         ), file=sys.stderr)
         score, possible, stdout = grade_one(config, repo, sub)
+        if 'norm' in config:
+            score = round(score/possible * config['norm'])
+            possible = config['norm']
         message = '' if score == possible else stdout
         basename = os.path.basename(sub)
-        if basename.endswith('.tar.gz'):
-            email = basename[:-len('.tar.gz')]
-        else:
-            email = basename
+        email = basename[:-len('.tar.gz')].split('_')[0]
         results.append({'email': email, 'grade': score, 'comment': message})
         print('  {}: {} points'.format(email, score), file=sys.stderr)
     results.sort(key=lambda r: r['grade'])
