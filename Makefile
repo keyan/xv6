@@ -188,7 +188,10 @@ qemu-gdb: $K/kernel .gdbinit fs.img
 ##  FOR submitting lab solutions
 ##
 
-LAB := $(shell git symbolic-ref --short HEAD)
+LAB := $(shell git symbolic-ref --short HEAD 2> /dev/null)
+ifeq ($(LAB),)
+LAB := $(shell cat conf/LAB)
+endif
 
 ifneq ($(V),@)
 GRADEFLAGS += -v
@@ -226,6 +229,9 @@ handin-check:
 	fi
 
 tarball: handin-check
-	git archive --format=tar HEAD | gzip > lab-$(LAB)-handin.tar.gz
+	echo $(LAB) > conf/LAB
+	git archive --format=tar -o lab-$(LAB)-handin.tar HEAD
+	tar rf lab-$(LAB)-handin.tar conf/LAB
+	gzip -f lab-$(LAB)-handin.tar
 
 .PHONY: tarball tarball-pref clean grade handin-check
