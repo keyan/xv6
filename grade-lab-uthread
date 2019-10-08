@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+
+import re
+from gradelib import *
+
+r = Runner(save("xv6.out"))
+
+@test(25, "uthread")
+def test_uthread():
+    r.run_qemu(shell_script([
+        'uthread'
+    ]))
+    tids = re.findall('^my thread 0x[0-9A-F]{16}$', r.qemu.output, re.M)
+    if not len(tids) > 2:
+        raise AssertionError('Output does not contain "my thread 0x..."')
+    t1, t2 = tids[:2]
+    expected = ['my thread running', t1, 'my thread running', t2]
+    expected.extend([t1, t2] * 99)
+    expected.extend(['my thread: exit'] * 2)
+    expected.append('thread_schedule: no runnable threads')
+    if not re.findall('\n'.join(expected), r.qemu.output, re.M):
+        raise AssertionError('Output does not match expected output')
+
+run_tests()
