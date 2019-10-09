@@ -186,8 +186,7 @@ void            virtio_disk_intr(int);
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))
 
-// Extra files for allocator lab
-
+// extra files for lab alloc
 
 // buddy.c
 void           bd_init(void*,void*);
@@ -206,3 +205,14 @@ void lst_push(struct list*, void *);
 void *lst_pop(struct list*);
 void lst_print(struct list*);
 int lst_empty(struct list*);
+
+// extra files for lab net
+
+// net.c
+void            netinit(void);
+int             nettimer(void);
+
+// virtio_net.c
+int             virtio_net_init(int, void *);
+int             virtio_net_send(int, const void *data, int len);
+int             virtio_net_recv(int, void *data, int len);
