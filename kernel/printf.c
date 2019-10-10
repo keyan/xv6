@@ -115,12 +115,27 @@ printf(char *fmt, ...)
 }
 
 void
+backtrace(uint64 fp)
+{
+  uint64 ra, low = PGROUNDDOWN(fp) + 16, high = PGROUNDUP(fp);
+
+  while(!(fp & 7) && fp >= low && fp < high){
+    ra = *(uint64*)(fp - 8);
+    printf("[<%p>]\n", ra);
+    fp = *(uint64*)(fp - 16);
+  }
+}
+
+void
 panic(char *s)
 {
+  register uint64 fp asm("s0");
+
   pr.locking = 0;
   printf("PANIC: ");
   printf(s);
   printf("\n");
+  backtrace(fp);
   printf("HINT: restart xv6 using 'make qemu-gdb', type 'b panic' (to set breakpoint in panic) in the gdb window, followed by 'c' (continue), and when the kernel hits the breakpoint, type 'bt' to get a backtrace\n");
   panicked = 1; // freeze other CPUs
   for(;;)

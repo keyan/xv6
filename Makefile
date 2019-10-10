@@ -179,6 +179,9 @@ QEMUOPTS += -no-user-config
 qemu: $K/kernel fs.img
 	$(QEMU) $(QEMUOPTS)
 
+qemu-trace: $K/kernel stacktrace fs.img
+	$(QEMU) $(QEMUOPTS) | ./stacktrace
+
 .gdbinit: .gdbinit.tmpl-riscv
 	sed "s/:1234/:$(GDBPORT)/" < $^ > $@
 
