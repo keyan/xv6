@@ -11,11 +11,11 @@ def test_alarmtest():
         'alarmtest'
     ]))
 
-@test(20, "alarmtest: test0", parent=test_alarmtest)
+@test(30, "alarmtest: test0", parent=test_alarmtest)
 def test_alarmtest_test0():
     r.match('^test0 passed$')
 
-@test(30, "alarmtest: test1", parent=test_alarmtest)
+@test(50, "alarmtest: test1", parent=test_alarmtest)
 def test_alarmtest_test1():
     r.match('^test1 passed$')
 

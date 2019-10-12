@@ -5,7 +5,7 @@ from gradelib import *
 
 r = Runner(save("xv6.out"))
 
-@test(25, "uthread")
+@test(100, "uthread")
 def test_uthread():
     r.run_qemu(shell_script([
         'uthread'
