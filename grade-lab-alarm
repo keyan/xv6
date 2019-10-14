@@ -17,7 +17,7 @@ def test_alarmtest_test0():
 
 @test(50, "alarmtest: test1", parent=test_alarmtest)
 def test_alarmtest_test1():
-    r.match('^test1 passed$')
+    r.match('^\\.?test1 passed$')
 
 @test(20, "usertests")
 def test_usertests():
