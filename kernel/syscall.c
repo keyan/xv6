@@ -105,7 +105,6 @@ extern uint64 sys_wait(void);
 extern uint64 sys_write(void);
 extern uint64 sys_uptime(void);
 extern uint64 sys_ntas(void);
-extern uint64 sys_crash(void);
 extern uint64 sys_nfree(void);
 
 static uint64 (*syscalls[])(void) = {
@@ -131,7 +130,6 @@ static uint64 (*syscalls[])(void) = {
 [SYS_mkdir]   sys_mkdir,
 [SYS_close]   sys_close,
 [SYS_ntas]    sys_ntas,
-[SYS_crash]   sys_crash,
 [SYS_nfree]   sys_nfree,
 };
 
