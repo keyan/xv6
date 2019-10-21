@@ -150,12 +150,11 @@ sys_ntas(void)
     return 0;
   }
 
-  printf("=== lock kmem/bcache stats\n");
+  printf("=== lock kmem stats\n");
   for(int i = 0; i < NLOCK; i++) {
     if(locks[i] == 0)
       break;
-    if(strncmp(locks[i]->name, "bcache", strlen("bcache")) == 0 ||
-       strncmp(locks[i]->name, "kmem", strlen("kmem")) == 0) {
+    if(strncmp(locks[i]->name, "kmem", strlen("kmem")) == 0) {
       tot += locks[i]->nts;
       print_lock(locks[i]);
     }
