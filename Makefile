@@ -180,6 +180,11 @@ UPROGS=\
 	$U/_bcachetest\
 	$U/_alloctest\
 	$U/_specialtest\
+	$U/_sleep\
+	$U/_pingpong\
+	$U/_primes\
+	$U/_find\
+	$U/_xargs\
 	# $U/_symlinktest\
 
 fs.img: mkfs/mkfs README user/xargstest.sh $(UPROGS)
